@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: demo
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mydb
+    username: rocky
+    password: Aa1125544
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+logging:
+  file:
+    name: logs/app.log

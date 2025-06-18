@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres:16
+    container_name: postgres_db
+    restart: always
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  # backend:
+  #   build: ./backend
+  #   container_name: spring_backend
+  #   restart: always
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   environment:
+  #     SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+  #     SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+  #     SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+  #   volumes:
+  #     - ./backend:/app/src          # 掛載本地原始碼
+  #     - C:/Users/Rocky/.m2:/root/.m2   # 可選，掛載本地 maven repository 快取
+  #   command: ./mvnw spring-boot:run    # 用 spring-boot:run 啟動，方便熱重載
+
+  frontend:
+    build: ./frontend
+    container_name: vue_frontend
+    restart: always
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    command: npm run dev -- --host 0.0.0.0
